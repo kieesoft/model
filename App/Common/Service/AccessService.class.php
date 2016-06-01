@@ -10,6 +10,10 @@ namespace Common\Service;
 
 use Common\Conf\MyException;
 
+/**访问权限类。
+ * Class AccessService
+ * @package Common\Service
+ */
 class AccessService {
     /**
      * @param $id(ActionID)

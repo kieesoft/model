@@ -13,8 +13,8 @@ namespace Common\Service;
  */
 class LoginService {
     /**检查用户表密码
-     * @param $username
-     * @param $password
+     * @param $username string 用户名
+     * @param $password string 密码
      * @return int -1用户名不存在，0密码错误，1登录成功
      */
     public function checkPasswordAsUser($username,$password){
