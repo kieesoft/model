@@ -10,5 +10,5 @@
 ##Thinkphp
 Thinkphp文件，当前基于3.2.3开发。
 
-#web
+##web
 网页发布目录。包含所有的css、js、img等类型文件，以及thinkphp框架的入口文件index.php

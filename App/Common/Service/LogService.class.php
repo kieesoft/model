@@ -16,8 +16,8 @@ class LogService extends MyModel{
     /**获取日志列表
      * @param int $page
      * @param int $rows
-     * @param string $start
-     * @param string $end
+     * @param string $start 开始
+     * @param string $end 结束
      * @param string $userId
      * @param string $action
      * @param string $success

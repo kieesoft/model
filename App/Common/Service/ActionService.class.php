@@ -8,7 +8,7 @@
 namespace Common\Service;
 use Common\Model\MyModel;
 
-/**
+/**动作服务
  * Class ActionService
  * @package Admin\Service
  */
@@ -78,6 +78,12 @@ class ActionService extends MyModel{
         }
         return $result;
     }
+
+    /**构建节点。
+     * @param $one int 单一节点
+     * @param string $state 打开与关闭状态
+     * @return array
+     */
     private function buildNode($one,$state=''){
         if($state=='') $state = $this->hasChild($one['id']) ? 'closed' : 'open';
         if($one['parentid']==1) {
