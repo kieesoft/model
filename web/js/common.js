@@ -6,12 +6,12 @@
         '403':'禁止访问！',
         '404':'页面未找到!',
         '500':'内部服务器错误！',
+        '700':'未定义错误！',
         '701':'您还没有登陆系统，请先登陆！',
         '702':'您的账户已在其他电脑登录！',
         '703':'无权访问！',
         '704':'用户不存在！',
-        '705':'输入数据有错误！',
-        '706':'数据库连接参数错误！'
+        '705':'访问参数错误或不完整'
     };
     var _ajax=$.ajax;
     $.ajax=function(opt){
@@ -39,8 +39,8 @@
         var _opt = $.extend(opt,{
             error:function(XMLHttpRequest, textStatus, errorThrown){
                 //错误增强处理
-                var loginUrl = "/";
-                $.messager.alert(errorCode[XMLHttpRequest.status],XMLHttpRequest.statusText,"error");
+                var loginUrl = "/web/";
+                $.messager.alert('错误',errorCode[XMLHttpRequest.status]+"</br>"+XMLHttpRequest.statusText,"error");
                 //未登录或者超时情况
                 if(XMLHttpRequest.status==701||XMLHttpRequest.status==702){
                     //绑定确定按钮事件
@@ -117,7 +117,7 @@ function bindMessageErrorEven(errorMsg, callbacks, messageType){
             this.bindTabEven(); //绑定tabs事件
             this.bindContextMenuEven(); //绑定右键菜单事件
             this.update(0,this.onlyOpenTitle); //更新默认首页标题
-        }
+        };
 
         /**
          * 创建必要HTML
@@ -441,7 +441,7 @@ function bindMessageErrorEven(errorMsg, callbacks, messageType){
                     _obj.bindSingleLeftMenuEven(this);
                 }
             })
-        }
+        };
 
         this.openForJson = function(url){
             $.post( url, {hasJson:true}, function(rsp) {
@@ -463,5 +463,29 @@ function bindMessageErrorEven(errorMsg, callbacks, messageType){
             return m;
         }
     });
+    //获取URL中的参数
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r!=null) return (r[2]); return null;
+    }
+    //检查是否为数字
+    function IsNum(s)
+    {
+        if (s!=null && s!="")
+        {
+            return !isNaN(s);
+        }
+        return false;
+    }
+    //获取url？符号后面部分
+    function getRequest() {
+        var url = window.location.href;//  location.search; //获取url中"?"符后的字串
+        var paramIndex=url.indexOf("?");
+        if (paramIndex!= -1) {
+            return  url.substring(paramIndex+1,url.length);
 
+        }
+        return -1;
+    }
 

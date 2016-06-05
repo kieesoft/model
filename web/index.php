@@ -2,25 +2,20 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006-2014 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006-2015 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-// 应用入口文件
-
-// 检测PHP环境
-if(version_compare(PHP_VERSION,'5.3.0','<'))  die('require PHP > 5.3.0 !');
-
-// 开启调试模式 建议开发阶段开启 部署阶段注释或者设为false,上线时将这个调试信息改为false
-define('APP_DEBUG',true);
-define('BUILD_DIR_SECURE', false);
+// [ 应用入口文件 ]
+//定义被thinkphp删除的几个常量
+define('TITLE','宁波城市学院教务管理系统');
+define('COPYRIGHT','Copyright by keysoft corp. @2016 技术支持：88221932 版本号：20160604');
 // 定义应用目录
-define('APP_PATH','../App/');
-
-// 引入ThinkPHP入口文件
-require '../ThinkPHP/ThinkPHP.php';
-
-// 亲^_^ 后面不需要任何代码了 就是如此简单
+define('APP_PATH', __DIR__ . '/../app/');
+// 开启调试模式
+define('APP_DEBUG', true);
+// 加载框架引导文件
+require __DIR__ . '/../thinkphp/start.php';

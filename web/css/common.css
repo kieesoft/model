@@ -107,8 +107,14 @@ a:hover{ color:Red; text-decoration:none;}
 
 .container{padding: 5px;}
 
-.information ol li,.information ol{line-height: 20px;font-size:11pt;margin-left: 15px;}
+.information ol li,.information ol{line-height: 20px;font-size:10pt;margin-left: 15px;}
 
 .space{margin:5px;}
 .warn{color:red;font-weight: bold;font-size:110%}
-.welcome{text-align:center;font-size: 30pt;padding: 300px 0;font-family: "Microsoft YaHei", sans-serif}
+.welcome{text-align:center;font-size: 30pt;padding: 300px 0;font-family: "Microsoft YaHei", sans-serif;color: #0000ff}
+.pagetitle{text-align: center;font-size: 14px;font-weight: bold;color:blue;height:40px;line-height: 40px}
+/*自定义表格样式*/
+.mytable{border:1px  solid #CDC9C9;font:"宋体" 11pt #000;width:900px;margin:0 auto;}
+.mytable td,.mytable th{border:1px solid #CDC9C9;height:35px;line-height:35px;width:180px;}
+.mytable th{text-align:right;font-weight:normal;padding-right:10px;background-color:#E3E3E3}
+.mytable td{padding-left:10px;}

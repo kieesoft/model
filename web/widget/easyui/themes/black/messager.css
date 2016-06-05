@@ -1,10 +1,10 @@
 .messager-body {
   padding: 10px;
-  overflow: auto;
+  overflow: hidden;
 }
 .messager-button {
   text-align: center;
-  padding: 5px;
+  padding-top: 10px;
 }
 .messager-button .l-btn {
   width: 70px;

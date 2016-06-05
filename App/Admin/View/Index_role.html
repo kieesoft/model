@@ -2,14 +2,24 @@
 <script type="text/javascript">
     $(function(){
         $('#dg').datagrid({
-            title:'角色管理',idField:'role', striped:'true',pagination:'true',rownumbers:true,singleSelect:true,pageSize:20, url:'__ROOT__/Admin/Role/query',toolbar:'#toolbar',
+            title:'角色管理',idField:'role', striped:'true',pagination:'true',rownumbers:true,singleSelect:true,pageSize:20, url:'{$ROOT}/Admin/Role/query',toolbar:'#toolbar',
             columns:[[
                 {field:'role',title:'角色代码*',width:60,align:'center',editor:{type:'validatebox',options:{validType:' equalLength[1]',required:true}}},
                 {field:'name',title:'名称*',width:200,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[40]',required:true}}}
             ]],
+            //标题行右键菜单
+            onHeaderContextMenu: function(e, field){
+                e.preventDefault();
+                if (!cmenu_obj.cmenu)//没有的话创建一个
+                    $('#dg').datagrid('createColumnMenu',cmenu_obj);
+                cmenu_obj.cmenu.menu('show', {
+                    left:e.pageX,
+                    top:e.pageY
+                });
+            },
             //点击单元格时候的事件
             onClickCell:function(index, field){
-                var tt=$('#dg')
+                var tt=$('#dg');
                 tt.datagrid('startEditing',{field:field,index:index});
                 current_datagrid=tt;
             },
@@ -73,10 +83,11 @@
                 count+=rows.length;
                 effectRow["inserted"]=$.toJSON(rows);
             }
-            if(count<=0) //如果没有任何更新，就退出
+            if(count<=0) {
+                $.messager.alert('提示','没有需要保存的数据！','info');
                 return;
-
-            $.post('__ROOT__/Admin/Role/update',effectRow,function(result){
+            }
+            $.post('{$ROOT}/Admin/Role/update',effectRow,function(result){
                 if (result.status==1){
                     tt.datagrid('acceptChanges');
                     tt.datagrid('reload');

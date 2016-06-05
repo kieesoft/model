@@ -2,16 +2,23 @@
 <script type="text/javascript">
     $(function(){
         $('#dg').datagrid({
-            title:'用户列表',idField:'id', striped:'true',pagination:'true',rownumbers:true,singleSelect:true,
-            url:'__ROOT__/Admin/User/query',toolbar:'#toolbar',
+            title:'用户列表',idField:'username', striped:'true',pagination:'true',rownumbers:true,singleSelect:true,pageSize:30,
+            url:'{$ROOT}/Admin/User/query',toolbar:'#toolbar',
             columns:[[
-            {field:'userid',title:'登录名*',width:100,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[45]',required:true}}},
-            {field:'teacherno',title:'教师号*',width:80,align:'center',editor:{type:'validatebox',options:{validType:'equalLength[6]',required:true}}},
-            {field:'name',title:'姓名*',width:80,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[40]',required:true}}},
-            {field:'sex',title:'性别*',width:50,align:'center',editor:{type:'checkbox',options:{on:'M',off:'F'}},
-                formatter:function(val,rec){if(val=='M') return '男'; else return '女';}},
-            {field:'role',title:'角色*',width:100,align:'center',editor:{type:'validatebox'}},
-            {field:'school',title:'学院*',width:100,align:'center', editor:{type:'combobox', options:{url:'__ROOT__/All/Option/school',valueField:'school',textField:'name',panelWidth:'120',required:true,
+            {field:'username',title:'登录名*',width:50,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[45]',required:true}}},
+            {field:'teacherno',title:'教师号*',width:50,align:'center',editor:{type:'validatebox',options:{validType:'equalLength[6]',required:true}}},
+            {field:'name',title:'姓名*',width:50,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[40]',required:true}}},
+            {field:'enteryear',title:'入校年*',width:50,align:'center',editor:{type:'validatebox',options:{validType:'equalLength[4]',required:true}}},
+            {field:'sex',title:'性别*',width:40,align:'center', editor:{type:'combobox', options:{url:'{$ROOT}/All/Option/sex',valueField:'sex',textField:'name',panelHeight:'auto',required:true,
+                onSelect:function(rec) {
+                    var tt=$('#dg');
+                    tt.datagrid('getSelected').sex=rec.name;
+                }}},
+                formatter:function(val,rec){
+                    return rec.sexname;
+                }},
+            {field:'role',title:'角色*',width:100,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[20]',required:true}}},
+            {field:'school',title:'学院*',width:100,align:'center', editor:{type:'combobox', options:{url:'{$ROOT}/All/Option/school',valueField:'school',textField:'name',panelWidth:'120',required:true,
                 onSelect:function(rec) {
                     var tt=$('#dg');
                     tt.datagrid('getSelected').schoolname=rec.name;
@@ -20,9 +27,9 @@
                 return rec.schoolname;
             }},
             {field:'lock',title:'锁定*',width:40,align:'center',editor:{type:'checkbox',options:{on:1,off:0}}, formatter:function(val,rec){if(val==1)return '√';}},
-            {field:'createdate',title:'创建时间',width:150,align:'center'},
-            {field:'lastlogintime',title:'登录时间',width:150,align:'center'},
-            {field:'lastloginip',title:'登录IP',width:90,align:'center'}
+            {field:'createdate',title:'创建时间',width:100,align:'center'},
+            {field:'logintime',title:'登录时间',width:100,align:'center'},
+            {field:'remoteip',title:'登录IP',width:90,align:'center'}
             ]],
             //标题行右键菜单
             onHeaderContextMenu: function(e, field){
@@ -70,11 +77,11 @@
         //分配部分数据表格
         $('#dg2').datagrid({
             title:'分配角色',idField:'role', striped:'true',rownumbers:true,singleSelect:false,
-            url:'__ROOT__/Admin/User/role',toolbar:'#toolbar2',
+            url:'{$ROOT}/Admin/User/role',toolbar:'#toolbar2',
             columns:[[
                 {field:'check',title:'选中',checkbox:true},
-                {field:'role',title:'角色代码',width:80,align:'center'},
-                {field:'name',title:'角色',width:100,align:'center'}
+                {field:'role',title:'角色代码',width:70,align:'center'},
+                {field:'name',title:'角色',width:160,align:'center'}
             ]],
             onSelect:function(index,row){
                 if(!$('#dg').datagrid('getSelected')){
@@ -98,23 +105,15 @@
         //著作部分 绑定新建按钮事件
         $("#insert,#menu_insert").click(function(){
             var tt=$('#dg');
-
             tt.datagrid('endEditing');
             if(tt.datagrid('editIndex')!=undefined) return;
             tt.datagrid('insertRow',{
                 index: 0,
                 row: {
-                    sex:'M',
-                    name:'',
-                    teacherno:'',
-                    userid:'',
-                    school:'01',
-                    schoolname:'商贸学院',
-                    role:'*',
-                    id:0
+                    role:'B*'
                 }
             });
-            tt.datagrid('startEditing',{field:'userid',index:0});
+            tt.datagrid('startEditing',{field:'username',index:0});
             current_datagrid=tt;
         });
         //取消更改
@@ -149,9 +148,11 @@
                 count+=rows.length;
                 effectRow["inserted"]=$.toJSON(rows);
             }
-            if(count<=0) //如果没有任何更新，就退出
+            if(count<=0) {
+                $.messager.alert('提示','没有需要保存的数据！','info');
                 return;
-            $.post('__ROOT__/Admin/User/update',effectRow,function(result){
+            }
+            $.post('{$ROOT}/Admin/User/update',effectRow,function(result){
                 if (result.status==1){
                     tt.datagrid('acceptChanges');
                     tt.datagrid('reload');
@@ -160,7 +161,7 @@
                         msg: result.info
                     });
                 } else {
-                    $.messager.alert(result.status,result.info,'error');
+                    $.messager.alert('错误',result.info,'error');
                 }
             },'json');
         });
@@ -188,8 +189,8 @@
             var roles="";
             for(var i=0;i<checkRows.length;i++)
                 roles+=checkRows[i].role;
-            var userId=$('#dg').datagrid('getSelected').id;
-            $.post('__ROOT__/Admin/User/updaterole',{userid:userId,role:roles},function(result){
+            var userName=$('#dg').datagrid('getSelected').username;
+            $.post('{$ROOT}/Admin/User/updaterole',{username:userName,role:roles},function(result){
                 if (result.status==1){
                     tt.datagrid('acceptChanges');
                     tt.datagrid('reload');
@@ -199,7 +200,7 @@
                     });
                     $('#dg').datagrid('reload');
                 } else {
-                    $.messager.alert(result.status,result.info,'error');
+                    $.messager.alert('错误',result.info,'error');
                 }
             },'json');
         });
@@ -210,41 +211,41 @@
             tt.datagrid('loadData',{total:0,rows:[]});
             tt.datagrid('load', {
                 name: $('#name').val(),
-                userid:$('#userid').val(),
+                username:$('#username').val(),
                 school:$('#school').combobox('getValue')
             });
         });
         //右键修改密码
         $("#menu_changepassword,#changepassword").click(function(){
-            var row= tt=$('#dg').datagrid('getSelected');
+            var row=$('#dg').datagrid('getSelected');
             if(!row){
                 $.messager.alert('错误','请先选择一个用户！','error');
                 return;
             }
             $.messager.prompt('修改', '请输入新密码:', function(data){
                 if (data){
-                    $.post('__ROOT__/Admin/User/changepassword',{userid:row.userid,password:data},function(result){
+                    $.post('{$ROOT}/Admin/User/changepassword',{teacherno:row.teacherno,password:data},function(result){
                         if (result.status==1){
                             $.messager.show({	// show error message
                                 title: '成功',
                                 msg: result.info
                             });
                         } else {
-                            $.messager.alert(result.status,result.info,'error');
+                            $.messager.alert('错误',result.info,'error');
                         }
                     },'json');
                 }
             });
         });
         $('#school').combobox({
-            url:'__ROOT__/All/Option/school',
+            url:'{$ROOT}/All/Option/school?only=0',
             valueField:'school',
             textField:'name'
         });
 
     });
 </script>
-<div class="container" style="width:1250px">
+<div class="container" style="width:1125px">
     <div id="menu" class="easyui-menu" style="width:100px;">
         <div id='menu_insert' data-options="iconCls:'icon icon-add'">新增用户</div>
         <div id='menu_save' data-options="iconCls:'icon icon-save'">保存</div>
@@ -256,15 +257,15 @@
     <div id="menu2" class="easyui-menu" style="width:100px;">
         <div id='menu2_save' data-options="iconCls:'icon icon-save'">保存用户角色</div>
     </div>
-    <div id="left" style="width:990px;float:left">
+    <div id="left" style="width:805px;float:left">
         <div id="toolbar">
             <div>
                 <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-add',plain:'true'"  id="insert">新增</a>
                 <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-remove',plain:'true'"  id="delete">删除</a>
                 <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-save',plain:'true'" id="save">保存</a>
                 <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-cancel',plain:'true'" id="cancel">取消</a>
-                <label for="userid">登录名：</label><input id="userid" class="easyui-validatebox" size="10" value="%"/>
-                <label for="name">姓名：</label><input id="name" class="easyui-validatebox" size="10" value="%"/>
+                <label for="username">登录名：</label><input id="username" class="easyui-validatebox" size="5" value="%"/>
+                <label for="name">姓名：</label><input id="name" class="easyui-validatebox" size="4" value="%"/>
                 <label for="school">学院：</label>
                 <input id="school">
                 <a href="javascript:void(0)" class="easyui-linkbutton"  data-options="iconCls:'icon icon-search',plain:'true'" id="searchuser">检索用户</a>
@@ -274,7 +275,7 @@
         <table id="dg">
         </table>
     </div>
-    <div id="right" style="width:250px;float:left;padding-left:5px;">
+    <div id="right" style="width:310px;float:left;padding-left:5px;">
         <div id="toolbar2">
             <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-save',plain:'true'" id="save2">保存角色配置</a>
         </div>

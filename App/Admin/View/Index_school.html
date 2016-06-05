@@ -3,15 +3,25 @@
     $(function(){
         $('#dg').datagrid({
             title:'院系管理',idField:'school', striped:'true',pagination:'true',rownumbers:true,singleSelect:true,pageSize:20,
-            url:'__ROOT__/Admin/School/query',toolbar:'#toolbar',
+            url:'{$ROOT}/Admin/School/query',toolbar:'#toolbar',
             columns:[[
                 {field:'school',title:'院号*',width:80,align:'center',editor:{type:'validatebox',options:{validType:' equalLength[2]',required:true}}},
                 {field:'name',title:'学院/部门名称*',width:200,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[45]',required:true}}},
-                {field:'fail',title:'废弃*',width:40,align:'center',editor:{type:'checkbox',options:{on:1,off:0}},
+                {field:'active',title:'在用*',width:40,align:'center',editor:{type:'checkbox',options:{on:1,off:0}},
                     formatter:function(val,rec){if(val==1)return '√';}},
                 {field:'manage',title:'职能部门*',width:60,align:'center',editor:{type:'checkbox',options:{on:1,off:0}},
                     formatter:function(val,rec){if(val==1)return '√';}}
             ]],
+            //标题行右键菜单
+            onHeaderContextMenu: function(e, field){
+                e.preventDefault();
+                if (!cmenu_obj.cmenu)//没有的话创建一个
+                    $('#dg').datagrid('createColumnMenu',cmenu_obj);
+                cmenu_obj.cmenu.menu('show', {
+                    left:e.pageX,
+                    top:e.pageY
+                });
+            },
             //点击单元格时候的事件
             onClickCell:function(index, field){
                 var tt= $('#dg');
@@ -39,7 +49,7 @@
             tt.datagrid('insertRow',{
                 index: 0,
                 row: {
-                    fail:0
+
                 }
             });
             tt.datagrid('startEditing',{field:'school',index:0});
@@ -52,7 +62,7 @@
             current_datagrid=null;
         });
         //绑定点击保存按钮事件
-        $("#save,#save").click(function(){
+        $("#menu_save,#save").click(function(){
             var tt=$('#dg');
             tt.datagrid('endEditing');
             if(tt.datagrid('editIndex')!=undefined) return;
@@ -77,10 +87,11 @@
                 count+=rows.length;
                 effectRow["inserted"]=$.toJSON(rows);
             }
-            if(count<=0) //如果没有任何更新，就退出
+            if(count<=0) {
+                $.messager.alert('提示','没有需要保存的数据！','info');
                 return;
-
-            $.post('__ROOT__/Admin/School/update',effectRow,function(result){
+            }
+            $.post('{$ROOT}/Admin/School/update',effectRow,function(result){
                 if (result.status==1){
                     tt.datagrid('acceptChanges');
                     tt.datagrid('reload');
@@ -89,7 +100,7 @@
                         msg: result.info
                     });
                 } else {
-                    $.messager.alert(result.status,result.info,'error');
+                    $.messager.alert('错误',result.info,'error');
                 }
             },'json');
         });

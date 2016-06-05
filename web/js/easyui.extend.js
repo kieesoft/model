@@ -5,7 +5,8 @@
 
 $.extend($.fn.datagrid.defaults,{
     editIndex:undefined,
-    editField:undefined
+    editField:undefined,
+    currentIndex:undefined
 });
 //拓展定义了datagrid方法
 $.extend($.fn.datagrid.methods, {
@@ -15,11 +16,14 @@ $.extend($.fn.datagrid.methods, {
     editField: function(jq){
         return $.data(jq[0], 'datagrid').editField;
     },
+    currentIndex: function(jq){
+        return $.data(jq[0], 'datagrid').currentIndex;
+    },
     nextEditor:function(jq,type){
         return jq.each(function(){
             var fields = $(this).datagrid('getColumnFields', true).concat($(this).datagrid('getColumnFields'));
             var field =$(this).datagrid('editField');
-            var index= $(this).datagrid('editIndex');
+            var index= $(this).datagrid('currentIndex');
             var length = $(this).datagrid('getRows').length;
             //如果是要行切换
             if (type == 'col') {
@@ -43,8 +47,11 @@ $.extend($.fn.datagrid.methods, {
                 $(this).datagrid('endEditing');
             else {
                 var col = $(this).datagrid('getColumnOption', field);
-                if (col.editor == null)
-                    $(this).datagrid('nextEditor',type);
+                if (col.editor == null) {
+                    $.data(this, 'datagrid').currentIndex=index;
+                    $.data(this, 'datagrid').editField=field;
+                    $(this).datagrid('nextEditor', type);
+                }
                 else {
                     $(this).datagrid('startEditing', {index:index,field:field});
                 }
@@ -75,6 +82,7 @@ $.extend($.fn.datagrid.methods, {
             }
             $.data(this, 'datagrid').editIndex=obj.index;
             $.data(this, 'datagrid').editField=obj.field;
+            $.data(this, 'datagrid').currentIndex=obj.index;
         });
     },
     //startEditing方法，进入编辑状态
@@ -119,7 +127,7 @@ $.extend($.fn.datagrid.methods, {
             tt=$(this);//定义一个，在onclick事件中用
             cmenu_obj.cmenu.menu({
                 onClick: function(item){
-                    if (item.iconCls == 'icon-ok'){
+                    if (item.iconCls == 'icon icon-ok'){
                         tt.datagrid('hideColumn', item.name);
                         cmenu_obj.cmenu.menu('setIcon', {
                             target: item.target,
@@ -129,7 +137,7 @@ $.extend($.fn.datagrid.methods, {
                         tt.datagrid('showColumn', item.name);
                         cmenu_obj.cmenu.menu('setIcon', {
                             target: item.target,
-                            iconCls: 'icon-ok'
+                            iconCls: 'icon icon-ok'
                         });
                     }
                 }
@@ -141,166 +149,12 @@ $.extend($.fn.datagrid.methods, {
                 cmenu_obj.cmenu.menu('appendItem', {
                     text: col.title,
                     name: field,
-                    iconCls: 'icon-ok'
+                    iconCls: 'icon icon-ok'
                 });
             }
         });
     }
 });
-
-function endEditingTree(tt,obj){
-    if (obj.editIndex == undefined){return true}
-    if (tt.treegrid('validateRow',obj.editIndex)){
-        tt.treegrid('endEdit', obj.editIndex);
-        obj.editIndex = undefined;
-        return true;
-    } else {
-        return false;
-    }
-}
-//拓展定义了treegrid
-$.extend($.fn.treegrid.methods, {
-    editIndex: function(jq){
-        return $.data(jq[0], 'treegrid').editIndex;
-    },
-    editField: function(jq){
-        return $.data(jq[0], 'treegrid').editField;
-    },
-    nextEditor:function(jq,type){
-        return jq.each(function(){
-            var fields = $(this).treegrid('getColumnFields', true).concat($(this).treegrid('getColumnFields'));
-            var field =$(this).treegrid('editField');
-            var index= $(this).treegrid('editIndex');
-            var length = $(this).treegrid('getRows').length;
-            //如果是要行切换
-            if (type == 'col') {
-                index++;
-            }
-            else {
-                for (var i = 0; i < fields.length; i++) {
-                    if (fields[i] == field) {
-                        if (i + 1 < fields.length) {
-                            field = fields[i + 1];
-                        }
-                        else {
-                            field = fields[0];
-                            index++;
-                        }
-                        break;
-                    }
-                }
-            }
-            if (index >= length)
-                $(this).treegrid('endEditing');
-            else {
-                var col = $(this).treegrid('getColumnOption', field);
-                if (col.editor == null)
-                    $(this).treegrid('nextEditor',type);
-                else {
-                    $(this).treegrid('startEditing', {index:index,field:field});
-                }
-            }
-        });
-    },
-    //editCell方法
-    editCell: function(jq,obj){
-        return jq.each(function(){
-            var opts = $(this).treegrid('options');
-            //获取所有冻结的与非冻结的字段
-            var fields = $(this).treegrid('getColumnFields',true).concat($(this).treegrid('getColumnFields'));
-
-            for(var i=0; i<fields.length; i++){
-                var col = $(this).treegrid('getColumnOption', fields[i]);
-                //临时保存起来，就剩下当前点的这个
-                col.editor1 = col.editor;
-                if (fields[i] != obj.field){
-                    col.editor = null;
-                }
-            }
-            //开始编辑行，由于其它的都已经被放成null，只会开始编辑当前这个。
-            $(this).treegrid('beginEdit', obj.index);
-            //再把editor恢复回去。
-            for(var i=0; i<fields.length; i++){
-                var col = $(this).treegrid('getColumnOption', fields[i]);
-                col.editor = col.editor1;
-            }
-            $.data(this, 'treegrid').editIndex=obj.index;
-            $.data(this, 'treegrid').editField=obj.field;
-        });
-    },
-    //startEditing方法，进入编辑状态
-    startEditing:function(jq,obj){
-        return jq.each(function(){
-            $(this).treegrid('endEditing');
-            var editIndex=  $(this).treegrid('editIndex');
-            if (editIndex==undefined){
-                $(this).treegrid('selectRow', obj.index)
-                    .treegrid('editCell',{index:obj.index,field:obj.field});
-                var ed = $(this).treegrid('getEditor', {index:obj.index,field:obj.field});
-                try{$(ed.target).select().focus();}catch(exception){}
-            }
-        });
-    },
-    //endEditing方法，结束编辑状态
-
-    endEditing:function(jq){
-        return jq.each(function(){
-            var editIndex=$.data(this, 'treegrid').editIndex;
-            var editField=$.data(this, 'treegrid').editField;
-            if ( editIndex== undefined){return}
-            var fields=$(this).treegrid('getColumnFields', true).concat($(this).treegrid('getColumnFields'));
-            for(var i=0; i<fields.length; i++) {
-                var field= fields[i];
-                $(this).treegrid('selectRow',editIndex).treegrid('editCell', {index:editIndex, field:field});
-                var ed = $(this).treegrid('getEditor', {index:editIndex,field:field});
-                if (!$(this).treegrid('validateRow', editIndex)) {
-                    try{$(ed.target).select().focus();}catch(exception){}
-                    return;
-                }
-                else{
-                    $(this).treegrid('endEdit',editIndex);
-                }
-            }
-            $.data(this, 'treegrid').editIndex = undefined;
-            $.data(this, 'treegrid').editField=undefined;
-        });
-    },
-    //创建表头菜单，使用对象的cmenu
-    createColumnMenu:function(jq,cmenu_obj){
-        return jq.each(function(){ //自定义的时候必须将jq.each用上，其实我也不知道为什么
-            cmenu_obj.cmenu = $('<div/>').appendTo('body');
-            tt=$(this);//定义一个，在onclick事件中用
-            cmenu_obj.cmenu.menu({
-                onClick: function(item){
-                    if (item.iconCls == 'icon-ok'){
-                        tt.treegrid('hideColumn', item.name);
-                        cmenu_obj.cmenu.menu('setIcon', {
-                            target: item.target,
-                            iconCls: 'icon-empty'
-                        });
-                    } else {
-                        tt.treegrid('showColumn', item.name);
-                        cmenu_obj.cmenu.menu('setIcon', {
-                            target: item.target,
-                            iconCls: 'icon-ok'
-                        });
-                    }
-                }
-            });
-            var fields = $(this).treegrid('getColumnFields');
-            for(var i=0; i<fields.length; i++){
-                var field = fields[i];
-                var col = $(this).treegrid('getColumnOption', field);
-                cmenu_obj.cmenu.menu('appendItem', {
-                    text: col.title,
-                    name: field,
-                    iconCls: 'icon-ok'
-                });
-            }
-        });
-    }
-});
-
 /**
  * linkbutton方法扩展
  * @param {Object} jq
@@ -376,4 +230,40 @@ $.extend($.fn.linkbutton.methods, {
         });
     }
 });
-//拓展定义datagrid的editors控件
+
+$.extend($.fn.validatebox.defaults.rules, {
+    equals: {
+        validator: function(value,param){
+            return value == $(param[0]).val();
+        },
+        message: '两次输入不同！'
+    },
+//扩展最小-最大验证 minmaxLength[6,20]
+    minmaxLength: {
+        validator: function(value, param){
+            return value.length >= param[0]&&value.length <= param[1];
+        },
+        message: '必须{0}-{1}个字符之间！'
+    },
+    minLength: {
+        validator: function(value, param){
+            return value.length >= param[0];
+        },
+        message: '至少{0}个字符！'
+    },
+    maxLength: {
+        validator: function(value, param){
+            return value.length <= param[0];
+        },
+        message: '不得超过{0}个字符！'
+    },
+    equalLength: {
+        validator: function(value, param){
+            return value.length == param[0];
+        },
+        message: '应为{0}个字符！'
+    }
+});
+
+
+

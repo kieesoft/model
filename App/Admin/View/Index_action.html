@@ -5,13 +5,13 @@
         $('#dg').treegrid({
             idField:'id',treeField:'description', striped:'true',rownumbers:true,singleSelect:true,
             animate: true,lines:true,
-            url:'__ROOT__/Admin/Action/query',toolbar:'#toolbar',
+            url:'{$ROOT}/Admin/Action/query',toolbar:'#toolbar',
             columns: [[
-                {field:'description',title:'描述*',width:300,editor:{type:'validatebox',options:{validType:'maxLength[45]'}}},
-                {field:'action',title:'动作*',width:250,editor:{type:'validatebox',options:{validType:'maxLength[45]'}}},
+                {field:'description',title:'描述*',width:250,editor:{type:'validatebox',options:{validType:'maxLength[45]'}}},
+                {field:'action',title:'动作*',width:200,editor:{type:'validatebox',options:{validType:'maxLength[45]'}}},
                 {field:'shortname',title:'简称*',width:50,align:'center',editor:{type:'validatebox',options:{validType:'maxLength[10]'}}},
                 {field:'id',title:'ID值',width:50,align:'center'},
-                {field:'image',title:'图标*',width:100, editor:{type:'combobox', options:{url:'__ROOT__/All/Option/icon',valueField:'name',textField:'name',panelWidth:120,panelHeight:150,required:true,
+                {field:'image',title:'图标*',width:100, editor:{type:'combobox', options:{url:'{$ROOT}/All/Option/icon',valueField:'name',textField:'name',panelWidth:120,panelHeight:150,required:true,
                 formatter:function(row){
                     return '<span class="icon '+row.name+'">&nbsp;</span>'+row.name;
                 }}},
@@ -23,7 +23,7 @@
                     if(val==1)
                         return '√';
                 }},
-                {field:'rank',title:'排序*',width:50,align:'center'}
+                {field:'rank',title:'排序*',width:50,align:'center',editor:{type:'numberbox',options:{precision:0}}}
             ]],
             onClickRow:function(row){
                 var tt=$('#dg2');
@@ -54,14 +54,14 @@
                 var selected=tt.treegrid('getSelected');
                 var node = jQuery.extend({},selected);
                 node.children=undefined;
-                $.post('__ROOT__/Admin/Action/update',{updated:node},function(result){
+                $.post('{$ROOT}/Admin/Action/update',{updated:node},function(result){
                     if (result.status==1){
                         $.messager.show({	// show error message
                             title: '成功',
                             msg: result.info
                         });
                     } else {
-                        $.messager.alert(result.status,result.info,'error');
+                        $.messager.alert('错误',result.info,'error');
                     }
                 },'json');
                 var parent=tt.treegrid('getParent',selected.id);
@@ -71,16 +71,16 @@
         //分配部分数据表格
         $('#dg2').datagrid({
             title:'角色分配',idField:'id', striped:'true',pagination:'true',rownumbers:true,singleSelect:true,
-            url:'__ROOT__/Admin/Action/role',toolbar:'#toolbar2',pageSize:5,pageList:[5,10],
+            url:'{$ROOT}/Admin/Action/role',queryParams:{id:0},toolbar:'#toolbar2',pageSize:5,pageList:[5,10],
             columns: [[
                 {field:'role',title:'代码',width:30,align:'center'},
-                {field:'name',title:'角色*',width:100,align:'center', editor:{type:'combobox', options:{url:'__ROOT__/All/Option/role',valueField:'name',textField:'name',panelHeight:0,required:true,
+                {field:'name',title:'角色*',width:100,align:'center', editor:{type:'combobox', options:{url:'{$ROOT}/All/Option/role',valueField:'name',textField:'name',panelWidth:160,panelHeight:400,required:true,
                     onSelect:function(rec){
                         var tt=$('#dg2');
                         tt.datagrid('getSelected').role=rec.role;
                     }
                 }}},
-                {field:'exe',title:'执*',width:30,align:'center',editor:{type:'checkbox',options:{on:16,off:0}},formatter:function(val,rec){if(val==16) return '√';}},
+                {field:'exe',title:'批*',width:30,align:'center',editor:{type:'checkbox',options:{on:16,off:0}},formatter:function(val,rec){if(val==16) return '√';}},
                 {field:'ins',title:'增*',width:30,align:'center',editor:{type:'checkbox',options:{on:8,off:0}},formatter:function(val,rec){if(val==8) return '√';}},
                 {field:'del',title:'删*',width:30,align:'center',editor:{type:'checkbox',options:{on:4,off:0}},formatter:function(val,rec){if(val==4)return '√';}},
                 {field:'modi',title:'改*',width:30,align:'center',editor:{type:'checkbox',options:{on:2,off:0}},formatter:function(val,rec){if(val==2)return '√';}},
@@ -182,14 +182,14 @@
                         tt.treegrid('remove',row.id);
                         var node={};
                         node.id=row.id;
-                        $.post('__ROOT__/Admin/Action/update',{deleted:node},function(result){
+                        $.post('{$ROOT}/Admin/Action/update',{deleted:node},function(result){
                             if (result.status==1){
                                 $.messager.show({	// show error message
                                     title: '成功',
                                     msg: result.info
                                 });
                             } else {
-                                $.messager.alert(result.status,result.info,'error');
+                                $.messager.alert('错误',result.info,'error');
                             }
                         },'json');
 
@@ -249,10 +249,11 @@
                 count+=rows.length;
                 effectRow["inserted"]=$.toJSON(rows);
             }
-            if(count<=0) //如果没有任何更新，就退出
+            if(count<=0) {
+                $.messager.alert('提示','没有需要保存的数据！','info');
                 return;
-
-            $.post('__ROOT__/Admin/Action/updaterole',effectRow,function(result){
+            }
+            $.post('{$ROOT}/Admin/Action/updaterole',effectRow,function(result){
                 if (result.status==1){
                     tt.datagrid('acceptChanges');
                     tt.datagrid('reload');
@@ -261,7 +262,7 @@
                         msg: result.info
                     });
                 } else {
-                    $.messager.alert(result.status,result.info,'error');
+                    $.messager.alert('错误',result.info,'error');
                 }
             },'json');
         });
@@ -293,7 +294,7 @@
         });
     });
 </script>
-<div class="container" style="width:1250px">
+<div class="container" style="width:1120px">
     <div id="menu" class="easyui-menu" style="width:100px;">
         <div id='menu_insert' data-options="iconCls:'icon icon-add'">新增</div>
         <div id='menu_edit' data-options="iconCls:'icon icon-pencil'">编辑本条目</div>
@@ -307,7 +308,7 @@
         <div id='menu2_save' data-options="iconCls:'icon icon-save'">保存分配</div>
         <div id='menu2_cancel' data-options="iconCls:'icon icon-cancel'">取消更改</div>
     </div>
-    <div id="left" style="width:890px;float:left">
+    <div id="left" style="width:790px;float:left">
         <div id="toolbar">
             <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-add',plain:'true'"  id="insert">新增</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-pencil',plain:'true'"  id="edit">编辑</a>
@@ -321,7 +322,7 @@
         </div>
         <table id="dg"></table>
     </div>
-    <div id="right" style="width:350px;float:left;padding-left:5px;">
+    <div id="right" style="width:320px;float:left;padding-left:5px;">
     <div id="toolbar2">
         <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-add',plain:'true'"  id="insert2">新增</a>
         <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon icon-remove',plain:'true'"  id="delete2">删除</a>
@@ -333,6 +334,7 @@
     <div class="information" style="clear:both">
         <ol>说明：
             <li>有*标注的为可编辑单元，双击击后可以修改内容。</li>
+            <li>可根据操作效果进行授权，分为批（批量执行）、增（新增记录）、删（删除记录）、改（修改记录）、查（查看记录）</li>
         </ol>
     </div>
 </div>

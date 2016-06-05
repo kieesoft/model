@@ -42,28 +42,23 @@
 .pagination span {
   font-size: 12px;
 }
-.pagination-link .l-btn-text {
-  width: 24px;
-  text-align: center;
-  margin: 0;
-}
 .pagination-first {
-  background: url('images/pagination_icons.png') no-repeat 0 center;
+  background: url('images/pagination_icons.png') no-repeat 0 0;
 }
 .pagination-prev {
-  background: url('images/pagination_icons.png') no-repeat -16px center;
+  background: url('images/pagination_icons.png') no-repeat -16px 0;
 }
 .pagination-next {
-  background: url('images/pagination_icons.png') no-repeat -32px center;
+  background: url('images/pagination_icons.png') no-repeat -32px 0;
 }
 .pagination-last {
-  background: url('images/pagination_icons.png') no-repeat -48px center;
+  background: url('images/pagination_icons.png') no-repeat -48px 0;
 }
 .pagination-load {
-  background: url('images/pagination_icons.png') no-repeat -64px center;
+  background: url('images/pagination_icons.png') no-repeat -64px 0;
 }
 .pagination-loading {
-  background: url('images/loading.gif') no-repeat center center;
+  background: url('images/loading.gif') no-repeat;
 }
 .pagination-page-list,
 .pagination .pagination-num {

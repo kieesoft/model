@@ -32,7 +32,7 @@
   position: absolute;
   top: 50%;
   margin-top: -20px;
-  padding: 10px 5px 10px 30px;
+  padding: 12px 5px 10px 30px;
   width: auto;
   height: 16px;
   border-width: 2px;
@@ -41,7 +41,6 @@
 }
 .datagrid-sort-icon {
   padding: 0;
-  display: none;
 }
 .datagrid-toolbar {
   height: auto;
@@ -57,7 +56,6 @@
   margin: 2px 1px;
 }
 .datagrid .datagrid-pager {
-  display: block;
   margin: 0;
   border-width: 1px 0 0 0;
   border-style: solid;
@@ -108,11 +106,10 @@
 }
 .datagrid-cell-group {
   text-align: center;
-  text-overflow: ellipsis;
 }
 .datagrid-header-rownumber,
 .datagrid-cell-rownumber {
-  width: 30px;
+  width: 25px;
   text-align: center;
   margin: 0;
   padding: 0;
@@ -178,28 +175,17 @@
   margin: 0;
   padding: 0;
 }
-.datagrid-view .datagrid-editable-input {
+.datagrid-body .datagrid-editable .datagrid-editable-input {
   margin: 0;
-  padding: 2px 4px;
-  border: 1px solid #D3D3D3;
-  font-size: 12px;
-  outline-style: none;
-  -moz-border-radius: 0 0 0 0;
-  -webkit-border-radius: 0 0 0 0;
-  border-radius: 0 0 0 0;
-}
-.datagrid-sort .datagrid-sort-icon {
-  display: inline;
-  padding: 0 13px 0 0;
-  background: url('images/datagrid_icons.png') no-repeat -64px center;
+  padding: 2px;
+  border-width: 1px;
+  border-style: solid;
 }
 .datagrid-sort-desc .datagrid-sort-icon {
-  display: inline;
   padding: 0 13px 0 0;
   background: url('images/datagrid_icons.png') no-repeat -16px center;
 }
 .datagrid-sort-asc .datagrid-sort-icon {
-  display: inline;
   padding: 0 13px 0 0;
   background: url('images/datagrid_icons.png') no-repeat 0px center;
 }
@@ -253,7 +239,6 @@
 .datagrid-btable,
 .datagrid-ftable {
   color: #000000;
-  border-collapse: separate;
 }
 .datagrid-row-alt {
   background: #fafafa;
@@ -268,9 +253,6 @@
   background: #0092DC;
   color: #fff;
 }
-.datagrid-row-editing .textbox,
-.datagrid-row-editing .textbox-text {
-  -moz-border-radius: 0 0 0 0;
-  -webkit-border-radius: 0 0 0 0;
-  border-radius: 0 0 0 0;
+.datagrid-body .datagrid-editable .datagrid-editable-input {
+  border-color: #D3D3D3;
 }
